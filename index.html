@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Công Cụ Tạo và Kiểm Tra Regex</title>
+    <title>Công Cụ Regex Toàn Diện</title>
     <style>
         /* CSS để trang web trông đẹp hơn */
         body {
@@ -20,6 +20,7 @@
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
         }
         h1, h2 {
             color: #111;
@@ -55,7 +56,7 @@
             border-radius: 4px;
         }
         .highlight {
-            background-color: #ffd700; /* Màu vàng để tô đậm */
+            background-color: #ffd700;
             border-radius: 3px;
             padding: 1px 2px;
             font-weight: bold;
@@ -85,20 +86,44 @@
              padding: 2px 4px;
              border-radius: 3px;
         }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Công Cụ Tạo và Kiểm Tra Regex</h1>
-        <p>Nhập biểu thức Regex và chuỗi kiểm tra, kết quả sẽ được tô màu trực tiếp.</p>
+        <h1>Công Cụ Regex Toàn Diện</h1>
 
+        <h2>Tạo Regex Nhanh từ URL</h2>
+        <div>
+            <label for="url-to-regex-input">URL Mẫu:</label>
+            <input type="text" id="url-to-regex-input" placeholder="Dán một URL hoàn chỉnh vào đây...">
+            <button id="url-to-regex-button">Tạo Regex</button>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <h2>Kiểm Tra và Tinh Chỉnh Regex</h2>
+        
         <div>
             <label for="regex-input">Biểu Thức Regex:</label>
-            <input type="text" id="regex-input" placeholder="Dán regex của bạn vào đây, ví dụ: \d+">
+            <input type="text" id="regex-input" placeholder="Nhập regex hoặc tạo từ URL ở trên">
             <div class="flags-container">
                 <label>
-                    <input type="checkbox" id="flag-g" checked> Global (g) - Tìm tất cả kết quả khớp
+                    <input type="checkbox" id="flag-g" checked> Global (g) - Tìm tất cả
                 </label>
                 <label>
                     <input type="checkbox" id="flag-i" checked> Insensitive (i) - Không phân biệt hoa/thường
@@ -124,6 +149,8 @@
 
     <script>
         // Lấy các element từ HTML
+        const urlToRegexInput = document.getElementById('url-to-regex-input');
+        const urlToRegexButton = document.getElementById('url-to-regex-button');
         const regexInput = document.getElementById('regex-input');
         const testStringInput = document.getElementById('test-string');
         const resultsDiv = document.getElementById('results');
@@ -136,25 +163,24 @@
             '\\.': "<code>.</code> : Khớp với bất kỳ ký tự nào (trừ dòng mới).",
             '\\d': "<code>\\d</code> : Khớp với một chữ số (0-9).",
             '\\D': "<code>\\D</code> : Khớp với một ký tự không phải là chữ số.",
-            '\\w': "<code>\\w</code> : Khớp với một ký tự chữ, số hoặc gạch dưới (word character).",
-            '\\W': "<code>\\W</code> : Khớp với một ký tự không phải là word character.",
+            '\\w': "<code>\\w</code> : Khớp với một ký tự chữ, số hoặc gạch dưới.",
+            '\\W': "<code>\\W</code> : Khớp với một ký tự không phải là chữ, số, gạch dưới.",
             '\\s': "<code>\\s</code> : Khớp với một ký tự khoảng trắng.",
             '\\S': "<code>\\S</code> : Khớp với một ký tự không phải là khoảng trắng.",
-            '*': "<code>*</code> : Khớp với ký tự đứng trước nó 0 hoặc nhiều lần.",
-            '+': "<code>+</code> : Khớp với ký tự đứng trước nó 1 hoặc nhiều lần.",
-            '?': "<code>?</code> : Khớp với ký tự đứng trước nó 0 hoặc 1 lần.",
-            '^': "<code>^</code> : Khớp với vị trí bắt đầu của chuỗi.",
-            '$': "<code>$</code> : Khớp với vị trí kết thúc của chuỗi.",
-            '[]': "<code>[]</code> : Khớp với bất kỳ ký tự nào bên trong cặp ngoặc vuông.",
-            '()': "<code>()</code> : Nhóm các ký tự lại với nhau (capturing group)."
+            '*': "<code>*</code> : Khớp với ký tự/nhóm đứng trước nó 0 hoặc nhiều lần.",
+            '+': "<code>+</code> : Khớp với ký tự/nhóm đứng trước nó 1 hoặc nhiều lần.",
+            '?': "<code>?</code> : Khớp với ký tự/nhóm đứng trước nó 0 hoặc 1 lần.",
+            '^': "<code>^</code> : Khớp với vị trí bắt đầu của chuỗi/dòng.",
+            '$': "<code>$</code> : Khớp với vị trí kết thúc của chuỗi/dòng.",
+            '[]': "<code>[]</code> : Định nghĩa một tập hợp các ký tự để khớp.",
+            '()': "<code>()</code> : Nhóm các biểu thức lại với nhau (capturing group)."
         };
 
-        // Hàm chính để cập nhật mọi thứ
+        // Hàm chính để cập nhật mọi thứ trong công cụ kiểm tra
         function updateAll() {
             const pattern = regexInput.value;
             const testString = testStringInput.value;
             
-            // Xóa các hiển thị cũ
             resultsDiv.innerHTML = '';
             explanationDiv.innerHTML = '';
 
@@ -163,7 +189,6 @@
                 return;
             }
             
-            // Xây dựng cờ (flags)
             let flags = '';
             if (flagG.checked) flags += 'g';
             if (flagI.checked) flags += 'i';
@@ -171,11 +196,10 @@
             try {
                 const regex = new RegExp(pattern, flags);
                 
-                // Hiển thị kết quả khớp
                 if (testString) {
-                    const highlighted = testString.replace(regex, '<span class="highlight">$&</span>');
-                    if (highlighted !== testString) {
-                        resultsDiv.innerHTML = highlighted;
+                    // Để tô màu đúng với cờ global, chúng ta cần thay thế tất cả các lần xuất hiện
+                    if (regex.test(testString)) {
+                         resultsDiv.innerHTML = testString.replace(regex, '<span class="highlight">$&</span>');
                     } else {
                         resultsDiv.textContent = 'Không có kết quả khớp.';
                     }
@@ -183,35 +207,80 @@
                      resultsDiv.textContent = 'Nhập chuỗi văn bản để xem kết quả.';
                 }
                 
-                // Hiển thị giải thích
                 const explanationList = document.createElement('ul');
+                const usedTokens = new Set();
+                
+                // Giải thích các token đơn giản
                 for (const key in regexExplanations) {
-                    // Kiểm tra xem pattern có chứa ký tự đặc biệt không
-                    // Điều này khá đơn giản, không phải là một parser hoàn chỉnh
-                    if (pattern.includes(key)) {
-                        const li = document.createElement('li');
-                        li.innerHTML = regexExplanations[key];
-                        explanationList.appendChild(li);
+                    if (pattern.includes(key) && !usedTokens.has(key)) {
+                         const li = document.createElement('li');
+                         li.innerHTML = regexExplanations[key];
+                         explanationList.appendChild(li);
+                         usedTokens.add(key);
                     }
                 }
+                 // Giải thích cho các ký tự không cần escape
+                if (pattern.includes('*') && !usedTokens.has('*')) explanationList.innerHTML += `<li>${regexExplanations['*']}</li>`;
+                if (pattern.includes('+') && !usedTokens.has('+')) explanationList.innerHTML += `<li>${regexExplanations['+']}</li>`;
+                if (pattern.includes('?') && !usedTokens.has('?')) explanationList.innerHTML += `<li>${regexExplanations['?']}</li>`;
+                if (pattern.includes('^') && !usedTokens.has('^')) explanationList.innerHTML += `<li>${regexExplanations['^']}</li>`;
+                if (pattern.includes('$') && !usedTokens.has('$')) explanationList.innerHTML += `<li>${regexExplanations['$']}</li>`;
+                if (pattern.includes('[]') && !usedTokens.has('[]')) explanationList.innerHTML += `<li>${regexExplanations['[]']}</li>`;
+                if (pattern.includes('()') && !usedTokens.has('()')) explanationList.innerHTML += `<li>${regexExplanations['()']}</li>`;
+
+
                 if(explanationList.children.length > 0){
                     explanationDiv.appendChild(explanationList);
                 } else {
-                    explanationDiv.textContent = "Không có ký tự đặc biệt nào cần giải thích."
+                    explanationDiv.textContent = "Regex không chứa ký tự đặc biệt phổ biến nào."
                 }
 
 
             } catch (e) {
-                // Hiển thị lỗi nếu Regex không hợp lệ
                 resultsDiv.innerHTML = `<span class="error">Lỗi Regex: ${e.message}</span>`;
             }
         }
+        
+        // --- LOGIC CHO CÔNG CỤ TẠO REGEX TỪ URL ---
+        function generateRegexFromUrl() {
+            const urlString = urlToRegexInput.value.trim();
+            if(!urlString) return;
 
-        // Gắn sự kiện 'input' để cập nhật live
+            try {
+                const url = new URL(urlString);
+
+                // Escape các ký tự đặc biệt trong URL để tạo thành một pattern an toàn
+                const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                
+                const protocol = url.protocol.slice(0, -1); // http: -> http
+                const hostname = escapeRegex(url.hostname);
+                const pathname = escapeRegex(url.pathname);
+                
+                // Tạo một Regex khá linh hoạt:
+                // - http hoặc https
+                // - hostname chính xác
+                // - pathname chính xác
+                // - cho phép có hoặc không có query string (?)
+                const generatedPattern = `^https?:\\/\\/${hostname}${pathname}(\\?.*)?$`;
+                
+                // Điền vào ô Regex và ô Test String
+                regexInput.value = generatedPattern;
+                testStringInput.value = urlString;
+                
+                // Chạy cập nhật cho công cụ kiểm tra
+                updateAll();
+
+            } catch (e) {
+                alert("URL không hợp lệ. Vui lòng kiểm tra lại.");
+            }
+        }
+        
+        // Gắn các sự kiện
         regexInput.addEventListener('input', updateAll);
         testStringInput.addEventListener('input', updateAll);
         flagG.addEventListener('change', updateAll);
         flagI.addEventListener('change', updateAll);
+        urlToRegexButton.addEventListener('click', generateRegexFromUrl);
 
         // Chạy lần đầu khi tải trang
         updateAll();
